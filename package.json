@@ -1,0 +1,28 @@
+{
+  "name": "simple-orders-tracker",
+  "version": "0.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "server": "npm run build:backend && node dist/backend/server.js",
+    "dev:backend": "tsx backend/server.ts",
+    "build:backend": "tsc -p tsconfig.backend.json",
+    "dev": "npm --workspace frontend run dev",
+    "build": "npm --workspace frontend run build",
+    "lint": "npm --workspace frontend run lint",
+    "preview": "npm --workspace frontend run preview"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.6.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}
