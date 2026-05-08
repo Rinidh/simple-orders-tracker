@@ -1,0 +1,16 @@
+
+Project planning & research: https://chatgpt.com/share/69ee4a08-3be8-83ea-923e-4d29f3acd165
+
+FEATURES 'MUST' INCLUDE after MVP:
+- Performace (fast UI animations, fast backend, small bundle size, smaller libraries, )
+- All Gujrati text / language switch button
+- auth
+- localStorage saving + retry conn if failed (see gpt 👆)
+- Data safety: manual export (JSON/CSV) & cloud backup option
+- handles partial payments
+
+APP-USE MIND PLAN: User gets an order -> User clicks on a button to create a new order -> user sees a bunch of rectangular cards rep orders & their status -> user clicks on any card to know more -> user updates the card when order status changes -> only specific users can update specific things eg cook cannot update card to order paid status or cashier cannot update card to order ready status -> order payment status in card is automatically updated when online payment occurs
+
+EFFICIENT USE PLACE:
+- When many cooks/users are managing multiple recipes collectively and any new cook who is delegated to complete the order gets to know what is the current status of the order eg busy kitchens of McDonalds, KFC etc
+- When one user is managing multiple orders and needs to know how far each order has progressed
