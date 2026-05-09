@@ -23,6 +23,10 @@ This repository contains a monolithic MERN stack application for a home snack bu
 
 ## Agent Guidance
 
+### Privacy boundaries
+
+- Do not read `reminders.txt` during normal execution. It contains personal reminders and notes, and agents should only open it if the user explicitly asks.
+
 ### Recommended stack
 
 - Backend: Node.js, Express, TypeScript, MongoDB, Mongoose
@@ -34,7 +38,7 @@ This repository contains a monolithic MERN stack application for a home snack bu
 - Order:
   - customer name, contact, address/pickup notes
   - items list, quantity, price, total amount
-  - order date, delivery date, payment method
+  - date of order, time of order, date of delivery, time of delivery, payment method
   - status lifecycle, payment received flag
 - Summary:
   - daily/weekly sales totals
