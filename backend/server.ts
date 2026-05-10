@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express from "express";
 import connectToDatabase from "./db";
+import orderRouter from "./routes/order.route";
 
 dotenv.config();
 
@@ -9,9 +10,7 @@ const port = process.env.PORT ?? "5000";
 
 app.use(express.json());
 
-app.get("/api/orders", (_req, res) => {
-  res.json({ status: "ok" });
-});
+app.use("/api/orders", orderRouter);
 
 async function startServer(): Promise<void> {
   try {

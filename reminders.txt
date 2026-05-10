@@ -67,12 +67,25 @@ Success Criteria
 
 ROUTES:
 GET /api/orders
+GET /api/orders?status=""&paymentReceived=""&customerName=""&startDate=""&endDate=""
 GET /api/orders/:id
 POST /api/orders
 PUT /api/orders/:id
 PATCH /api/orders/:id/status
 PATCH /api/orders/:id/payment
 DELETE /api/orders/:id
+
+FILTERS WHEN GETTING ORDERS:
+customerName
+status
+paymentReceived
+startDate - btn which to fetch orders
+endDate - btn which to fetch orders
+
+PROBLEMATIC CODE:
+- order.controller.ts: getRouteParam() returns null if req.params.id is string[]. Small issue as req.params.id is rarely string[]
+- current validateItems(value) requires an entire 'array of body.items'. In updateItems(), the frontend will have to send the entire array of items again even though only one item's one field has got updated. Small issue as array of items is not usually very big and frontend can re-send whole array of items with updated item fields
+- 
 
 
 
