@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "server": "npm run build:backend && node dist/backend/server.js",
-    "dev:backend": "tsx backend/server.ts",
+    "dev:backend": "tsx watch backend/server.ts",
     "build:backend": "tsc -p tsconfig.backend.json",
     "dev": "npm --workspace frontend run dev",
     "build": "npm --workspace frontend run build",
