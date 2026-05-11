@@ -434,7 +434,7 @@ export async function updateOrderStatus(
     const order = await OrderModel.findByIdAndUpdate(
       id,
       { status },
-      { new: true, runValidators: true },
+      { returnDocument: "after", runValidators: true },
     );
 
     if (!order) {
@@ -475,7 +475,7 @@ export async function updatePaymentReceived(
     const order = await OrderModel.findByIdAndUpdate(
       id,
       { paymentReceived },
-      { new: true, runValidators: true },
+      { returnDocument: "after", runValidators: true },
     );
 
     if (!order) {
