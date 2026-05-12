@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import connectToDatabase from "./db";
 import orderRouter from "./routes/order.route";
+import reportRouter from "./routes/report.route";
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const port = process.env.PORT ?? "5000";
 app.use(express.json());
 
 app.use("/api/orders", orderRouter);
+app.use("/api/reports", reportRouter);
 
 async function startServer(): Promise<void> {
   try {
