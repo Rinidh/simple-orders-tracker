@@ -1,10 +1,11 @@
 import mongoose from 'mongoose';
+import { ConfigurationError } from './errors/configuration-error';
 
 async function connectToDatabase(): Promise<void> {
   const mongoUri = process.env.MONGODB_URI;
 
   if (!mongoUri) {
-    throw new Error('MONGODB_URI is not set');
+    throw new ConfigurationError('MONGODB_URI is not set');
   }
 
   mongoose.connection.on('connected', () => {

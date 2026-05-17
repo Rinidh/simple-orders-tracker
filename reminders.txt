@@ -1,3 +1,4 @@
+WARN: This file is for planning, outlining and personal reference. It may or may not match the current commit logic. Please ignore it
 
 Project planning & research: https://chatgpt.com/share/69ee4a08-3be8-83ea-923e-4d29f3acd165
 
@@ -20,8 +21,8 @@ APP-USE MIND PLAN:
 User gets an order -> User clicks on a button to create a new order -> user sees a bunch of rectangular cards rep orders & their status -> user clicks on any card to know more -> user updates the card when order status changes -> only specific users can update specific things eg cook cannot update card to order paid status or cashier cannot update card to order ready status -> order payment status in card is automatically updated when online payment occurs
 
 MOST EFFICIENT USE OF APP:
-- When many cooks/users are managing multiple recipes collectively and any new cook who is delegated to complete the order gets to know what is the current status of the order eg busy kitchens of McDonalds, KFC etc
-- When one user is managing multiple orders and needs to know how far each order has progressed
+  - When many cooks/users are managing multiple recipes collectively and any new cook who is delegated to complete the order gets to know what is the current status of the order eg busy kitchens of McDonalds, KFC etc
+  - When one user is managing multiple orders and needs to know how far each order has progressed
 
 
 MVP DEVELOPMENT PLAN:
@@ -43,6 +44,7 @@ MVP DEVELOPMENT PLAN:
   Route handlers in backend/routes/
   Controllers for business logic
   Middleware for validation and error handling
+
   Phase 2: Frontend (Weeks 2-3)
   Core Pages:
 
@@ -59,6 +61,7 @@ MVP DEVELOPMENT PLAN:
   React Router for navigation
   Custom hooks for API calls
   Mobile-first responsive CSS
+
   Phase 3: Integration & Deployment (Week 4)
   Frontend API integration with backend
   Error handling and loading states
@@ -97,4 +100,63 @@ REPORTS
   gpt: what else apart from totalAmt can be fetched from /api/reports
 
 
+MIDDLEWARE ADDITION:
+  Critical (Must Have)
+  Global Error Handler Middleware
+
+  Issue: Async errors in controllers aren't caught by Express; unhandled rejections crash the app
+  Benefit: Graceful error handling, consistent error responses, prevents server crashes
+  Use case: When getOrders or getReport aggregation fails
+  Async Route Handler Wrapper
+
+  Issue: Try-catch in every controller is repetitive and error-prone
+  Benefit: Automatically catches async errors and passes to error handler
+  Example: Wrap all async controllers to eliminate manual error handling
+  High Priority
+  Request Validation Middleware
+
+  Issue: Validation logic duplicated across controllers (order.controller.ts has extensive manual validation)
+  Benefit: Centralize validation, reduce controller bloat, reusable across routes
+  Tools: express-validator or zod
+  Benefit for this app: Move the large validateOrderInput function out of controller
+  Input Sanitization Middleware
+
+  Issue: User input (customerName, notes) could contain NoSQL injection operators or malicious data
+  Benefit: Prevent injection attacks, XSS vulnerabilities
+  Example: Sanitize regex patterns in $regex queries like the customerName filter
+  Request Logging Middleware
+
+  Issue: No visibility into API usage, errors, or performance
+  Benefit: Debug issues, track API patterns, monitor endpoints
+  Tools: morgan for HTTP logging, or custom winston/pino
+  Medium Priority
+  Request Size/Timeout Middleware
+
+  Issue: Large file uploads or long-running aggregations could hang/crash
+  Benefit: Prevent resource exhaustion, set reasonable limits
+  Example: Limit JSON body to 10MB, set 30s timeout on aggregation queries
+  CORS Middleware
+
+  Issue: Frontend and backend may run on different ports during development
+  Benefit: Allow frontend to communicate with backend across origins
+  Current state: Likely needed for dev/mobile testing
+  Nice to Have (For Growth)
+  Rate Limiting Middleware
+
+  Issue: No protection against brute force or API abuse
+  Benefit: Prevent abuse, fair resource usage
+  Tools: express-rate-limit
+  Example: Limit to 100 requests/min per IP
+  Request ID Middleware
+
+  Issue: Hard to correlate logs across multiple requests
+  Benefit: Better debugging, distributed tracing preparation
+  Pattern: Inject unique request ID into responses for tracking
+  Recommended Priority Implementation Order
+  Global error handler + async wrapper → prevents crashes
+  Request logging → visibility
+  Input sanitization → security
+  CORS → functionality (if needed)
+  Request validation → cleanup + reduce code
+  Rate limiting → security hardening
 
