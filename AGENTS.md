@@ -62,6 +62,7 @@ This repository contains a monolithic MERN stack application for a home snack bu
 - Use REST endpoints like `/api/orders`, `/api/reports`
 - Build frontend with small-screen-first CSS and touch-friendly UI
 - Document component and API conventions for future agents
+- In backend code, use custom error classes from `backend/errors/` and throw instances of those classes from controllers and middleware so API errors are handled consistently
 
 ## Implementation notes
 
