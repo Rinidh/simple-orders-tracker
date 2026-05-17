@@ -254,6 +254,12 @@ function getRouteParam(value: string | string[] | undefined): string | null {
   return typeof value === "string" ? value : null;
 }
 
+function isIsoDateString(value: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?)?$/.test(
+    value,
+  );
+}
+
 function validateOrderId(value: string | string[] | undefined): string {
   const id = getRouteParam(value);
 
@@ -333,7 +339,7 @@ export async function getOrders(req: Request, res: Response): Promise<void> {
     const orderDate: Record<string, Date> = {};
 
     if (startDate !== undefined) {
-      if (typeof startDate !== "string") {
+      if (typeof startDate !== "string" || !isIsoDateString(startDate)) {
         throw new BadRequestError("Invalid startDate", [
           "startDate must be a valid ISO date string",
         ]);
@@ -350,7 +356,7 @@ export async function getOrders(req: Request, res: Response): Promise<void> {
     }
 
     if (endDate !== undefined) {
-      if (typeof endDate !== "string") {
+      if (typeof endDate !== "string" || !isIsoDateString(endDate)) {
         throw new BadRequestError("Invalid endDate", [
           "endDate must be a valid ISO date string",
         ]);
