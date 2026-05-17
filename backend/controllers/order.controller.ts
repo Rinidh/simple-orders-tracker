@@ -1,10 +1,13 @@
 import type { Request, Response } from "express";
-import mongoose from "mongoose";
+import { Types } from "mongoose";
 import {
   OrderModel,
   orderStatuses,
   paymentMethods,
 } from "../models/order.model";
+import { BadRequestError } from "../errors/bad-request-error";
+import { DocumentCastError } from "../errors/document-cast-error";
+import { NotFoundError } from "../errors/not-found-error";
 
 type OrderItemInput = {
   name?: unknown;
@@ -61,22 +64,6 @@ const editableOrderFields = [
   "status",
   "paymentReceived",
 ] as const;
-
-function sendServerError(res: Response, error: unknown): void {
-  if (error instanceof mongoose.Error.ValidationError) {
-    res.status(400).json({
-      message: "Order validation failed",
-      errors: Object.values(error.errors).map(
-        (fieldError) => fieldError.message,
-      ),
-    });
-    return;
-  }
-
-  res.status(500).json({
-    message: "Something went wrong while processing the order request",
-  });
-}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -263,34 +250,43 @@ function validateOrderInput(
   return { ok: true, value };
 }
 
-function isValidOrderId(id: string): boolean {
-  return mongoose.Types.ObjectId.isValid(id);
-}
-
 function getRouteParam(value: string | string[] | undefined): string | null {
   return typeof value === "string" ? value : null;
+}
+
+function validateOrderId(value: string | string[] | undefined): string {
+  const id = getRouteParam(value);
+
+  if (!id || !Types.ObjectId.isValid(id)) {
+    throw new DocumentCastError("Invalid order id", [], id ?? undefined);
+  }
+
+  return id;
+}
+
+async function findOrderOrThrow(id: string) {
+  const order = await OrderModel.findById(id);
+
+  if (!order) {
+    throw new NotFoundError("Order not found");
+  }
+
+  return order;
 }
 
 export async function createOrder(req: Request, res: Response): Promise<void> {
   const validation = validateOrderInput(req.body, true);
 
   if (!validation.ok) {
-    res
-      .status(400)
-      .json({ message: "Invalid order data", errors: validation.errors });
-    return;
+    throw new BadRequestError("Invalid order data", validation.errors);
   }
 
-  try {
-    const order = await OrderModel.create(validation.value);
+  const order = await OrderModel.create(validation.value);
 
-    res.status(201).json({
-      message: "Order created successfully",
-      data: order,
-    });
-  } catch (error) {
-    sendServerError(res, error);
-  }
+  res.status(201).json({
+    message: "Order created successfully",
+    data: order,
+  });
 }
 
 export async function getOrders(req: Request, res: Response): Promise<void> {
@@ -298,33 +294,76 @@ export async function getOrders(req: Request, res: Response): Promise<void> {
   const { status, paymentReceived, customerName, startDate, endDate } =
     req.query;
 
-  if (typeof status === "string") {
+  if (status !== undefined) {
+    if (
+      typeof status !== "string" ||
+      !orderStatuses.includes(status as (typeof orderStatuses)[number])
+    ) {
+      throw new BadRequestError("Invalid status filter", [
+        `status must be one of: ${orderStatuses.join(", ")}`,
+      ]);
+    }
+
     filter.status = status;
   }
 
-  if (paymentReceived === "true" || paymentReceived === "false") {
+  if (paymentReceived !== undefined) {
+    if (paymentReceived !== "true" && paymentReceived !== "false") {
+      throw new BadRequestError("Invalid paymentReceived filter", [
+        "paymentReceived must be true or false",
+      ]);
+    }
+
     filter.paymentReceived = paymentReceived === "true";
   }
 
-  if (typeof customerName === "string" && customerName.trim().length > 0) {
-    filter.customerName = { $regex: customerName.trim(), $options: "i" };
-  }
-
-  if (typeof startDate === "string" || typeof endDate === "string") {
-    const orderDate: Record<string, Date> = {};
-
-    if (typeof startDate === "string") {
-      const parsedStart = new Date(startDate);
-      if (!Number.isNaN(parsedStart.getTime())) {
-        orderDate.$gte = parsedStart;
-      }
+  if (customerName !== undefined) {
+    if (typeof customerName !== "string") {
+      throw new BadRequestError("Invalid customerName filter", [
+        "customerName must be a string",
+      ]);
     }
 
-    if (typeof endDate === "string") {
-      const parsedEnd = new Date(endDate);
-      if (!Number.isNaN(parsedEnd.getTime())) {
-        orderDate.$lte = parsedEnd;
+    if (customerName.trim().length > 0) {
+      filter.customerName = { $regex: customerName.trim(), $options: "i" };
+    }
+  }
+
+  if (startDate !== undefined || endDate !== undefined) {
+    const orderDate: Record<string, Date> = {};
+
+    if (startDate !== undefined) {
+      if (typeof startDate !== "string") {
+        throw new BadRequestError("Invalid startDate", [
+          "startDate must be a valid ISO date string",
+        ]);
       }
+
+      const parsedStart = new Date(startDate);
+      if (Number.isNaN(parsedStart.getTime())) {
+        throw new BadRequestError("Invalid startDate", [
+          "startDate must be a valid ISO date string",
+        ]);
+      }
+
+      orderDate.$gte = parsedStart;
+    }
+
+    if (endDate !== undefined) {
+      if (typeof endDate !== "string") {
+        throw new BadRequestError("Invalid endDate", [
+          "endDate must be a valid ISO date string",
+        ]);
+      }
+
+      const parsedEnd = new Date(endDate);
+      if (Number.isNaN(parsedEnd.getTime())) {
+        throw new BadRequestError("Invalid endDate", [
+          "endDate must be a valid ISO date string",
+        ]);
+      }
+
+      orderDate.$lte = parsedEnd;
     }
 
     if (Object.keys(orderDate).length > 0) {
@@ -332,187 +371,117 @@ export async function getOrders(req: Request, res: Response): Promise<void> {
     }
   }
 
-  try {
-    const orders = await OrderModel.find(filter).sort({
-      orderDate: -1,
-      createdAt: -1,
-    });
+  const orders = await OrderModel.find(filter).sort({
+    orderDate: -1,
+    createdAt: -1,
+  });
 
-    res.status(200).json({
-      message: "Orders fetched successfully",
-      count: orders.length,
-      data: orders,
-    });
-  } catch (error) {
-    sendServerError(res, error);
-  }
+  res.status(200).json({
+    message: "Orders fetched successfully",
+    count: orders.length,
+    data: orders,
+  });
 }
 
 export async function getOrderById(req: Request, res: Response): Promise<void> {
-  const id = getRouteParam(req.params.id);
+  const id = validateOrderId(req.params.id);
+  const order = await findOrderOrThrow(id);
 
-  if (!id || !isValidOrderId(id)) {
-    res.status(400).json({ message: "Invalid order id" });
-    return;
-  }
-
-  try {
-    const order = await OrderModel.findById(id);
-
-    if (!order) {
-      res.status(404).json({ message: "Order not found" });
-      return;
-    }
-
-    res.status(200).json({
-      message: "Order fetched successfully",
-      data: order,
-    });
-  } catch (error) {
-    sendServerError(res, error);
-  }
+  res.status(200).json({
+    message: "Order fetched successfully",
+    data: order,
+  });
 }
 
 export async function updateOrder(req: Request, res: Response): Promise<void> {
-  const id = getRouteParam(req.params.id);
-
-  if (!id || !isValidOrderId(id)) {
-    res.status(400).json({ message: "Invalid order id" });
-    return;
-  }
+  const id = validateOrderId(req.params.id);
 
   const validation = validateOrderInput(req.body, false);
 
   if (!validation.ok) {
-    res
-      .status(400)
-      .json({ message: "Invalid order data", errors: validation.errors });
-    return;
+    throw new BadRequestError("Invalid order data", validation.errors);
   }
 
-  try {
-    const order = await OrderModel.findById(id);
+  const order = await findOrderOrThrow(id);
 
-    if (!order) {
-      res.status(404).json({ message: "Order not found" });
-      return;
-    }
+  order.set(validation.value);
+  await order.save();
 
-    order.set(validation.value);
-    await order.save();
-
-    res.status(200).json({
-      message: "Order updated successfully",
-      data: order,
-    });
-  } catch (error) {
-    sendServerError(res, error);
-  }
+  res.status(200).json({
+    message: "Order updated successfully",
+    data: order,
+  });
 }
 
 export async function updateOrderStatus(
   req: Request,
   res: Response,
 ): Promise<void> {
-  const id = getRouteParam(req.params.id);
+  const id = validateOrderId(req.params.id);
   const { status } = req.body as { status?: unknown };
 
-  if (!id || !isValidOrderId(id)) {
-    res.status(400).json({ message: "Invalid order id" });
-    return;
-  }
-
   if (typeof status !== "string" || !orderStatuses.includes(status as never)) {
-    res.status(400).json({
-      message: "Invalid status",
-      errors: [`status must be one of: ${orderStatuses.join(", ")}`],
-    });
-    return;
+    throw new BadRequestError("Invalid status", [
+      `status must be one of: ${orderStatuses.join(", ")}`,
+    ]);
   }
 
-  try {
-    const order = await OrderModel.findByIdAndUpdate(
-      id,
-      { status },
-      { returnDocument: "after", runValidators: true },
-    );
+  const order = await OrderModel.findByIdAndUpdate(
+    id,
+    { status },
+    { returnDocument: "after", runValidators: true },
+  );
 
-    if (!order) {
-      res.status(404).json({ message: "Order not found" });
-      return;
-    }
-
-    res.status(200).json({
-      message: "Order status updated successfully",
-      data: order,
-    });
-  } catch (error) {
-    sendServerError(res, error);
+  if (!order) {
+    throw new NotFoundError("Order not found");
   }
+
+  res.status(200).json({
+    message: "Order status updated successfully",
+    data: order,
+  });
 }
 
 export async function updatePaymentReceived(
   req: Request,
   res: Response,
 ): Promise<void> {
-  const id = getRouteParam(req.params.id);
+  const id = validateOrderId(req.params.id);
   const { paymentReceived } = req.body as { paymentReceived?: unknown };
 
-  if (!id || !isValidOrderId(id)) {
-    res.status(400).json({ message: "Invalid order id" });
-    return;
-  }
-
   if (typeof paymentReceived !== "boolean") {
-    res.status(400).json({
-      message: "Invalid payment data",
-      errors: ["paymentReceived must be a boolean"],
-    });
-    return;
+    throw new BadRequestError("Invalid payment data", [
+      "paymentReceived must be a boolean",
+    ]);
   }
 
-  try {
-    const order = await OrderModel.findByIdAndUpdate(
-      id,
-      { paymentReceived },
-      { returnDocument: "after", runValidators: true },
-    );
+  const order = await OrderModel.findByIdAndUpdate(
+    id,
+    { paymentReceived },
+    { returnDocument: "after", runValidators: true },
+  );
 
-    if (!order) {
-      res.status(404).json({ message: "Order not found" });
-      return;
-    }
-
-    res.status(200).json({
-      message: "Order payment status updated successfully",
-      data: order,
-    });
-  } catch (error) {
-    sendServerError(res, error);
+  if (!order) {
+    throw new NotFoundError("Order not found");
   }
+
+  res.status(200).json({
+    message: "Order payment status updated successfully",
+    data: order,
+  });
 }
 
 export async function deleteOrder(req: Request, res: Response): Promise<void> {
-  const id = getRouteParam(req.params.id);
+  const id = validateOrderId(req.params.id);
 
-  if (!id || !isValidOrderId(id)) {
-    res.status(400).json({ message: "Invalid order id" });
-    return;
+  const order = await OrderModel.findByIdAndDelete(id);
+
+  if (!order) {
+    throw new NotFoundError("Order not found");
   }
 
-  try {
-    const order = await OrderModel.findByIdAndDelete(id);
-
-    if (!order) {
-      res.status(404).json({ message: "Order not found" });
-      return;
-    }
-
-    res.status(200).json({
-      message: "Order deleted successfully",
-      data: order,
-    });
-  } catch (error) {
-    sendServerError(res, error);
-  }
+  res.status(200).json({
+    message: "Order deleted successfully",
+    data: order,
+  });
 }
