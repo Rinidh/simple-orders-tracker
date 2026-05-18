@@ -5,7 +5,7 @@ import {
   orderStatuses,
   paymentMethods,
 } from "../models/order.model";
-import { BadRequestError } from "../errors/bad-request-error";
+import { ValidationError } from "../errors/validation-error";
 import { DocumentCastError } from "../errors/document-cast-error";
 import { NotFoundError } from "../errors/not-found-error";
 
@@ -284,7 +284,7 @@ export async function createOrder(req: Request, res: Response): Promise<void> {
   const validation = validateOrderInput(req.body, true);
 
   if (!validation.ok) {
-    throw new BadRequestError("Invalid order data", validation.errors);
+    throw new ValidationError("Invalid order data", validation.errors);
   }
 
   const order = await OrderModel.create(validation.value);
@@ -305,7 +305,7 @@ export async function getOrders(req: Request, res: Response): Promise<void> {
       typeof status !== "string" ||
       !orderStatuses.includes(status as (typeof orderStatuses)[number])
     ) {
-      throw new BadRequestError("Invalid status filter", [
+      throw new ValidationError("Invalid status filter", [
         `status must be one of: ${orderStatuses.join(", ")}`,
       ]);
     }
@@ -315,7 +315,7 @@ export async function getOrders(req: Request, res: Response): Promise<void> {
 
   if (paymentReceived !== undefined) {
     if (paymentReceived !== "true" && paymentReceived !== "false") {
-      throw new BadRequestError("Invalid paymentReceived filter", [
+      throw new ValidationError("Invalid paymentReceived filter", [
         "paymentReceived must be true or false",
       ]);
     }
@@ -325,7 +325,7 @@ export async function getOrders(req: Request, res: Response): Promise<void> {
 
   if (customerName !== undefined) {
     if (typeof customerName !== "string") {
-      throw new BadRequestError("Invalid customerName filter", [
+      throw new ValidationError("Invalid customerName filter", [
         "customerName must be a string",
       ]);
     }
@@ -340,14 +340,14 @@ export async function getOrders(req: Request, res: Response): Promise<void> {
 
     if (startDate !== undefined) {
       if (typeof startDate !== "string" || !isIsoDateString(startDate)) {
-        throw new BadRequestError("Invalid startDate", [
+        throw new ValidationError("Invalid startDate", [
           "startDate must be a valid ISO date string",
         ]);
       }
 
       const parsedStart = new Date(startDate);
       if (Number.isNaN(parsedStart.getTime())) {
-        throw new BadRequestError("Invalid startDate", [
+        throw new ValidationError("Invalid startDate", [
           "startDate must be a valid ISO date string",
         ]);
       }
@@ -357,14 +357,14 @@ export async function getOrders(req: Request, res: Response): Promise<void> {
 
     if (endDate !== undefined) {
       if (typeof endDate !== "string" || !isIsoDateString(endDate)) {
-        throw new BadRequestError("Invalid endDate", [
+        throw new ValidationError("Invalid endDate", [
           "endDate must be a valid ISO date string",
         ]);
       }
 
       const parsedEnd = new Date(endDate);
       if (Number.isNaN(parsedEnd.getTime())) {
-        throw new BadRequestError("Invalid endDate", [
+        throw new ValidationError("Invalid endDate", [
           "endDate must be a valid ISO date string",
         ]);
       }
@@ -405,7 +405,7 @@ export async function updateOrder(req: Request, res: Response): Promise<void> {
   const validation = validateOrderInput(req.body, false);
 
   if (!validation.ok) {
-    throw new BadRequestError("Invalid order data", validation.errors);
+    throw new ValidationError("Invalid order data", validation.errors);
   }
 
   const order = await findOrderOrThrow(id);
@@ -427,7 +427,7 @@ export async function updateOrderStatus(
   const { status } = req.body as { status?: unknown };
 
   if (typeof status !== "string" || !orderStatuses.includes(status as never)) {
-    throw new BadRequestError("Invalid status", [
+    throw new ValidationError("Invalid status", [
       `status must be one of: ${orderStatuses.join(", ")}`,
     ]);
   }
@@ -456,7 +456,7 @@ export async function updatePaymentReceived(
   const { paymentReceived } = req.body as { paymentReceived?: unknown };
 
   if (typeof paymentReceived !== "boolean") {
-    throw new BadRequestError("Invalid payment data", [
+    throw new ValidationError("Invalid payment data", [
       "paymentReceived must be a boolean",
     ]);
   }

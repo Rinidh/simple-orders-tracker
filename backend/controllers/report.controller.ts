@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { OrderModel } from "../models/order.model";
-import { BadRequestError } from "../errors/bad-request-error";
+import { ValidationError } from "../errors/validation-error";
 
 function parseDate(value: unknown): Date | null {
   if (typeof value !== "string") {
@@ -21,7 +21,7 @@ export async function getReport(req: Request, res: Response): Promise<void> {
   if (startDate !== undefined) {
     const parsedStart = parseDate(startDate);
     if (!parsedStart) {
-      throw new BadRequestError("Invalid startDate", [
+      throw new ValidationError("Invalid startDate", [
         "startDate must be a valid ISO date string",
       ]);
     }
@@ -34,7 +34,7 @@ export async function getReport(req: Request, res: Response): Promise<void> {
   if (endDate !== undefined) {
     const parsedEnd = parseDate(endDate);
     if (!parsedEnd) {
-      throw new BadRequestError("Invalid endDate", [
+      throw new ValidationError("Invalid endDate", [
         "endDate must be a valid ISO date string",
       ]);
     }
