@@ -8,6 +8,7 @@ import {
 import mongoose from "mongoose";
 import { CustomError } from "../errors/custom-error.js";
 import { DocumentCastError } from "../errors/document-cast-error.js";
+import logger from "../logger";
 
 export const errorHandler = (
   err: unknown,
@@ -29,7 +30,7 @@ export const errorHandler = (
     }
 
     case err instanceof DocumentCastError: {
-      console.warn(`Invalid mongo ID detected: ${err.invalidMongoId}`);
+      logger.warn(`Invalid mongo ID detected: ${(err as any).invalidMongoId}`);
       res.status(err.statusCode).json({
         message: err.message,
         errors: err.errors,
@@ -52,7 +53,7 @@ export const errorHandler = (
 
     case (err as MongoServerError).name === "MongoServerError" &&
       (err as MongoServerError).code === 11000: {
-      console.warn(
+      logger.warn(
         `Duplicate unique key: ${JSON.stringify((err as MongoServerError).keyValue)}`,
       );
       res
@@ -64,7 +65,7 @@ export const errorHandler = (
     case err instanceof MongoNetworkError ||
       err instanceof MongoServerSelectionError ||
       err instanceof MongoNetworkTimeoutError: {
-      console.error(err);
+      logger.error("Database unavailable error", { error: err as any });
 
       res.status(503).json({
         message: "Database unavailable",
@@ -74,7 +75,7 @@ export const errorHandler = (
     }
 
     case (err as any).code === "ECONNRESET": {
-      console.error(err);
+      logger.error("Connection reset error", { error: err as any });
 
       res.status(503).json({
         message: "Service is unavailable",
@@ -84,16 +85,14 @@ export const errorHandler = (
     }
 
     case err instanceof Error:
-      console.error("An unhandled error was thrown");
-      console.error(err);
+      logger.error("An unhandled error was thrown", { error: err as any });
       return res.status(500).json({
         message: "Internal Server Error",
         errors: [],
       });
 
     default:
-      console.error("An unknown non-error was thrown");
-      console.error(err);
+      logger.error("An unknown non-error was thrown", { error: err as any });
       return res.status(500).json({
         message: "Internal Server Error",
         errors: [],

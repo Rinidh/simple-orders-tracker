@@ -6,6 +6,7 @@ import reportRouter from "./routes/report.route";
 import { errorHandler } from "./middleware/error";
 import { NotFoundError } from "./errors/not-found-error";
 import { UnsupportedMediaTypeError } from "./errors/unsupported-media-type-error";
+import logger from "./logger";
 
 dotenv.config();
 
@@ -44,11 +45,10 @@ async function startServer(): Promise<void> {
     await connectToDatabase();
 
     app.listen(port, () => {
-      console.log(`Server listening on port ${port}`);
+      logger.info(`Server listening on port ${port}`);
     });
   } catch (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
+    logger.error("Failed to start server", { error: error as any });
   }
 }
 

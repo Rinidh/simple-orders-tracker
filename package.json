@@ -5,6 +5,7 @@
   "workspaces": [
     "frontend"
   ],
+  "type": "module",
   "scripts": {
     "server": "npm run build:backend && node dist/backend/server.js",
     "dev:backend": "tsx watch backend/server.ts",
@@ -17,7 +18,9 @@
   "dependencies": {
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "mongoose": "^9.6.1"
+    "mongoose": "^9.6.1",
+    "winston": "^3.9.0",
+    "winston-mongodb": "^5.0.7"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
