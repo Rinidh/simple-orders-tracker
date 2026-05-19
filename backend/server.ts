@@ -6,9 +6,12 @@ import reportRouter from "./routes/report.route";
 import { errorHandler } from "./middleware/error";
 import { NotFoundError } from "./errors/not-found-error";
 import { UnsupportedMediaTypeError } from "./errors/unsupported-media-type-error";
-import logger from "./logger";
+import logger, { addMongoTransport } from "./logger";
 
 dotenv.config();
+
+// Ensure the MongoDB transport is added after environment variables are loaded.
+addMongoTransport(process.env.MONGODB_URI);
 
 const app = express();
 const port = process.env.PORT ?? "5000";

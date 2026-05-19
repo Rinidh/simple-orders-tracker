@@ -1,10 +1,22 @@
 import winston from "winston";
 import "winston-mongodb";
 import path from "path";
+import _ from "lodash";
 
 const { combine, timestamp, printf, colorize, errors, splat } = winston.format;
 
 const logDir = path.resolve(process.cwd(), "logs");
+
+//need to insert this custom format to ably apply meta data info to mongodb docs
+const insertMetaForWinstonMongo = winston.format((logEntry) => {
+  logEntry.meta = _.chain(logEntry)
+    .omit(logEntry as any, ["level", "message"])
+    .omitBy((value, key) => _.isSymbol(key))
+    .value();
+  // For winston-mongodb < 5.x, use:
+  // logEntry.meta = _.chain(logEntry).omit(logEntry, ['level', 'message']).omitBy((value, key) => _.isSymbol(key)).value();
+  return logEntry;
+});
 
 const serializeMeta = (meta: unknown) => {
   if (meta instanceof Error) {
@@ -79,18 +91,23 @@ const logger = winston.createLogger({
   ],
 });
 
-// Add MongoDB transport if MONGODB_URI provided
-if (process.env.MONGODB_URI) {
+// Expose a function to add the MongoDB transport at runtime. This allows
+// `dotenv.config()` to run before we check environment variables so the
+// transport is reliably added when a URI is provided.
+export function addMongoTransport(mongoUri?: string) {
+  if (!mongoUri) return;
+
   // winston-mongodb registers a MongoDB transport on winston.transports.MongoDB
   // @ts-ignore
   logger.add(
     new (winston.transports as any).MongoDB({
       level: "info",
-      db: process.env.MONGODB_URI,
+      db: mongoUri,
       options: { useUnifiedTopology: true },
       collection: process.env.LOG_COLLECTION ?? "logs",
       tryReconnect: true,
       metaKey: "meta",
+      format: combine(insertMetaForWinstonMongo(), baseFormat),
     }),
   );
 }
