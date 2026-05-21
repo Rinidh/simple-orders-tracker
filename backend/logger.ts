@@ -34,8 +34,9 @@ const serializeMeta = (meta: unknown) => {
   return String(meta);
 };
 
-const baseFormat = combine(
-  timestamp(),
+// Message formatter expects a `timestamp` field to be provided by the
+// transport-specific format (so transports can choose ISO vs human formats).
+const messageFormat = combine(
   errors({ stack: true }),
   splat(),
   printf((info) => {
@@ -65,12 +66,32 @@ const baseFormat = combine(
   }),
 );
 
-const consoleFormat = combine(colorize({ all: true }), baseFormat);
-const fileFormat = combine(timestamp(), errors({ stack: true }), splat());
+// Transport-specific timestamp formats
+const humanTimestamp = timestamp({
+  format: () =>
+    new Date().toLocaleString("en-GB", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    }),
+});
+
+const isoTimestamp = timestamp({ format: () => new Date().toISOString() });
+
+const consoleFormat = combine(
+  humanTimestamp,
+  colorize({ all: true }),
+  messageFormat,
+);
+const fileFormat = combine(humanTimestamp, messageFormat);
 
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL ?? "info",
-  format: baseFormat,
+  format: messageFormat,
   transports: [
     new winston.transports.Console({ format: consoleFormat }),
     new winston.transports.File({
@@ -107,7 +128,7 @@ export function addMongoTransport(mongoUri?: string) {
       collection: process.env.LOG_COLLECTION ?? "logs",
       tryReconnect: true,
       metaKey: "meta",
-      format: combine(insertMetaForWinstonMongo(), baseFormat),
+      format: combine(insertMetaForWinstonMongo(), isoTimestamp, messageFormat),
     }),
   );
 }
