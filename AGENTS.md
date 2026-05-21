@@ -71,6 +71,35 @@ This repository contains a monolithic MERN stack application for a home snack bu
 - Prefer reusable mobile components and compact list layouts
 - Ensure status changes and payment updates sync correctly
 
+## Logging
+
+The backend uses **Winston** for centralized logging across multiple transports:
+
+### Usage in Code
+
+```typescript
+import logger from "./logger";
+
+logger.debug("Cache refreshed", { cacheKey });
+logger.info("Order created", { orderId });
+logger.warn("Payment pending", { orderId });
+logger.error("Database connection failed", { error: err });
+```
+
+### Logging Rules
+
+- Use the shared Winston logger instance instead of console.log
+- Use appropriate log levels: `debug`, `info`, `warn`, `error`
+- Include relevant context as metadata (e.g., IDs, user info, request data, error instances)
+- Logs are written to:
+  - console
+  - log files in logs/
+  - MongoDB (logs collection) when configured
+- MongoDB transport is initialized at runtime in backend/server.ts after environment variables are loaded
+- Errors should use shared custom error classes from backend/errors/ for consistent logging and handling
+- Check `logs/` directory for file-based logs during development
+- Query the `logs` collection in MongoDB for production log retention and analysis
+
 ## Getting Started
 
 - `cd backend` and install backend dependencies
