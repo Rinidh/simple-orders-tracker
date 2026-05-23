@@ -260,6 +260,10 @@ function isIsoDateString(value: string): boolean {
   );
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 function validateOrderId(value: string | string[] | undefined): string {
   const id = getRouteParam(value);
 
@@ -330,8 +334,12 @@ export async function getOrders(req: Request, res: Response): Promise<void> {
       ]);
     }
 
-    if (customerName.trim().length > 0) {
-      filter.customerName = { $regex: customerName.trim(), $options: "i" };
+    const trimmedName = customerName.trim();
+    if (trimmedName.length > 0) {
+      filter.customerName = {
+        $regex: escapeRegExp(trimmedName),
+        $options: "i",
+      };
     }
   }
 

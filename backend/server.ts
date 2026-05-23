@@ -4,6 +4,7 @@ import connectToDatabase from "./db";
 import orderRouter from "./routes/order.route";
 import reportRouter from "./routes/report.route";
 import { errorHandler } from "./middleware/error";
+import { sanitizeRequestInput } from "./middleware/sanitize";
 import { NotFoundError } from "./errors/not-found-error";
 import { UnsupportedMediaTypeError } from "./errors/unsupported-media-type-error";
 import logger, { addMongoTransport } from "./logger";
@@ -34,6 +35,7 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
+app.use(sanitizeRequestInput);
 
 app.use("/api/orders", orderRouter);
 app.use("/api/reports", reportRouter);
