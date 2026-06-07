@@ -30,7 +30,7 @@ This repository contains a monolithic MERN stack application for a home snack bu
 ### Recommended stack
 
 - Backend: Node.js, Express, TypeScript, MongoDB, Mongoose
-- Frontend: React, Vite, TypeScript, CSS modules or utility-first responsive styles
+- Frontend: React, Vite, TypeScript, Tailwind CSS, React Router
 - Deployment: single server or cloud app with backend serving frontend build
 
 ### Data model concepts
