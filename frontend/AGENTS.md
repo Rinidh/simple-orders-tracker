@@ -9,16 +9,16 @@ It is a concise reference for implementers and future agents working on the mobi
 
 - `frontend/src/`
   - `App.tsx` — main router + shell
-  - `index.css` / `theme.css` — global styles and tokens
+  - `index.css` — global styles and tokens
   - `pages/`
     - `OrdersPage.tsx`
-    - `OrderDetailPage.tsx`
     - `NewOrderPage.tsx`
     - `ReportsPage.tsx`
   - `components/`
     - `OrderCard.tsx`
+    - `ItemCard.tsx`
+    - `ItemList.tsx`
     - `OrderList.tsx`
-    - `OrderForm.tsx`
     - `OrderDetailPanel.tsx`
     - `StatusBadge.tsx`
     - `FilterBar.tsx`
@@ -39,44 +39,67 @@ It is a concise reference for implementers and future agents working on the mobi
 ## Pages & responsibilities
 
 - OrdersPage
-  - List of orders (active first), `FilterBar`, live search, quick summary row
+  - List of orders (last ordered first), `FilterBar`, live search, quick summary row
   - Supports pull-to-refresh (mobile) and infinite scroll or page size control
-
-- OrderDetailPage
-  - Full order header (customer, contact, notes)
-  - Itemized list with qty/price, totals (subtotal, tax, total)
-  - Status control (timeline or dropdown) and payment toggle
-  - Inline edits for small fields and a clear Save action
+  - Shows `OrderList` with `OrderCard`s
+  - Add button in bottom right for adding new orders
 
 - NewOrderPage
-  - Dynamic `OrderForm` with add/remove item rows
-  - Live total calculation and validation
-  - Quick templates / recently used items (optional)
+  - Customer name input
+  - Contact input
+  - `ItemList` with one empty `ItemCard`
+  - Total amount display; live totals calculation and validation
+  - A row with Payment method dropdown, Payment Received chip (toggle)
+  - When Payment Received is true, Payment Method can only be set to 'Cash'
 
 - ReportsPage
-  - `SummaryTiles` for weekly totals, income, outstanding balance, counts
-  - Date-range controls and simple bar chart or sparkline
+  - Date-range controls; default set to previous one week
+  - `SummaryTiles` for total sales, outstanding balance (unpaid yet), orders completed out of all created, total items created
+  - simple bar chart or sparkline of total sales per day
 
-## Core components (concise)
+## Core components
 
 - `OrderCard`
-  - Compact card used in lists. Shows: customer, total, small item summary, colored `StatusBadge`, payment chip, time
-  - Quick actions: update status, mark paid, open detail
+  - Spacious, non-compact card
+  - Left column: customer name, item names summary (comma separated), delivery date (deadline)
+  - Right column: colored `StatusBadge`, Payment Received chip, total amount
+  - Quick actions: update status, mark paid
+  - Clicking/touching it opens `OrderDetailPanel` with more info
 
 - `OrderList`
   - Virtualized or paginated list container rendering `OrderCard`s
 
-- `OrderForm`
-  - Reusable inputs for items (name, qty, price), customer info, notes, payment
+- `ItemCard`
+  - Item name input; spans full width of parent
+  - Quantity input dropdown with values: 250 gm, 500 gm, 1kg, custom. Selecting 'Custom' allows inputting a non-negative integer. Quantity input spans half width of parent
+  - Payment Received chip (toggle); displays 'Yes' with green background and 'No' with red background
+  - Cross button at top right to delete `ItemCard` from `ItemList`
+
+- `ItemList`
+  - List container with `ItemCard`s
+  - A button to add more `ItemCard`s
+
+- `OrderDetailPanel`
+  - A drawer that slides in from bottom and overlays displayed components
+  - Header with customer name
+  - Customer contact below name in smaller font size
+  - Items table with item name, qty, price, and totals for price
+  - Two column layout:
+    - Left column: `StatusBadge`, deadline to deliver (delivery date), order date (dates are unchangeable, they are only displayed)
+    - Right column: Payment method dropdown, Payment Received chip
+  - Address or Pickup Notes input that is editable
+  - A clear Save action button that is disabled unless changes made
 
 - `StatusBadge`
-  - Small pill with color and icon reflecting lifecycle states
+  - Big visible pill with background colors, icons and text reflecting lifecycle states
+  - Clicking/touching on it changes it to next lifecycle state
 
 - `FilterBar`
-  - Chips for statuses, toggles for payment, date-range shortcuts, search input
+  - Filters for cards: Dropdown for statuses, chip for payment received
+  - Search input
 
 - `BottomNav`
-  - Primary app navigation: Orders, New Order, Reports
+  - Primary app navigation: Home (`OrdersPage`), New Order (`NewOrderPage`), Reports (`ReportsPage`)
 
 ## Hooks & data flow
 
@@ -86,41 +109,47 @@ It is a concise reference for implementers and future agents working on the mobi
 
 API endpoints mapping
 
-- GET `/api/orders` — list with query params: `status`, `paymentReceived`, `customerName`, `startDate`, `endDate`, `page`, `limit`
+- GET `/api/orders` — list with query params: `status`, `paymentReceived`, `customerName`, `startDate`, `endDate`
 - GET `/api/orders/:id` — single order
 - POST `/api/orders` — create order
 - PUT `/api/orders/:id` — full update
 - PATCH `/api/orders/:id/status` — update status
 - PATCH `/api/orders/:id/payment` — update payment flag
-- GET `/api/reports` — aggregated metrics (weekly, date-range)
+- DELETE `/api/orders/:id` —
+- GET `/api/reports` — aggregated metrics (date-range)
 
 ## Appearance & design tokens
 
-- Core tokens (suggested):
-  - Colors: `--bg`, `--surface`, `--text`, `--accent`, `--muted`, `--danger`, `--success`
-  - Spacing scale: `4,8,12,16,24` pixels base
-  - Radii: `4px`, `8px` for cards
-  - Elevation: subtle shadow for cards on mobile
-
-- Status color mapping (recommended):
-  - Ordered: `--accent` (blue)
-  - Preparing: amber/orange
-  - Ready: teal
-  - Out for Delivery: purple
-  - Delivered: green
-  - Paid: success/green with check icon
-
-- Typography & scale
-  - Use system fonts, medium size for primary text, compact secondary text
-  - 14–16px body, 18–20px card headings, 12px micro copy
+- Use Tailwind utility classes directly; there are no CSS custom properties in the current app shell.
+- Current color system:
+  - App background: `bg-gray-900`
+  - Primary text: `text-white`
+  - Header/footer surfaces: `bg-gray-800`
+  - Cards/content surfaces: `bg-gray-700`
+  - Borders and icon strokes: `border-gray-200`, `border-gray-700`, `text-gray-200`, `text-gray-400`
+  - Light action surface: `bg-gray-50 text-gray-800`, with hover states such as `hover:bg-gray-300`
+- Layout and spacing:
+  - App shell uses `min-h-screen`.
+  - Header uses `h-[10vh]`, `flex`, `items-center`, `justify-between`, and `shadow-md`.
+  - Filter/search row uses `flex flex-wrap`, `px-4`, `py-2`, `max-w-4xl`, and responsive wrapping for narrow screens.
+  - Main content uses `grid gap-4 grid-cols-autofit` with `p-4`.
+  - Mobile navigation is fixed to the bottom with `sm:hidden`; the add action is a fixed circular button above it.
+- Shape and elevation:
+  - Use `rounded-sm` for compact controls and inputs.
+  - Use `rounded-md` for images and order cards.
+  - Use `rounded-full` for profile images and floating action buttons.
+  - Use `shadow-md` for prominent fixed or shell elements.
+- Typography:
+  - The title uses `font-mono`, uppercase text, `tracking-[.5em]`, and responsive sizing from `text-xs` to `sm:text-base`.
+  - Bottom nav labels use `text-xs`.
+  - Keep page text compact and high contrast against the dark background.
 
 ## UX patterns
 
 - Mobile-first layout: single-column lists, edge-to-edge cards, large touch targets
 - Bottom navigation with primary actions reachable by thumb
 - Use color + icon + text in badges for quick recognition
-- Inline affordances: swiping a card for quick actions (optional)
-- Confirmations for destructive actions (delete, refund)
+- Confirmations for destructive actions (delete, cancel)
 
 ## Accessibility
 
@@ -135,6 +164,7 @@ API endpoints mapping
 - Centralize API URLs in `services/` and the fetch wrapper in `hooks/useApi.ts`
 - Keep components small and focused: presentational vs container separation
 - Use `StatusBadge` + enums from `types/` to avoid stringly-typed status code usage
+- Keep this file concise; expand component docs in `frontend/src/components/` as needed.
 
 ## Testing & linting
 
@@ -147,22 +177,3 @@ API endpoints mapping
 - Keep bundle small: prefer tiny utility libraries or vanilla helpers
 - Cache recent orders locally for offline-ish resilience and faster UI
 - Debounce search and limit frequent polling; prefer webhooks or real-time only if needed
-
-## Useful UX copy examples
-
-- Order card action: `Mark ready`, `Out for delivery`, `Delivered`, `Mark paid`
-- Empty state for orders: `No active orders — pull to refresh or create one.`
-
-## Implementation checklist (quick)
-
-- [ ] Scaffold pages and routes
-- [ ] Create `useApi`, `useOrders`, `useOrder` hooks
-- [ ] Implement `OrderList` + `OrderCard`
-- [ ] Implement `OrderForm` and `NewOrderPage`
-- [ ] Implement `ReportsPage` with `SummaryTiles`
-- [ ] Add theming tokens and global styles
-- [ ] Add tests for core flows
-
----
-
-Keep this file concise; expand component docs in `frontend/src/components/` as needed.
