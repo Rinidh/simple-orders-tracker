@@ -1,6 +1,6 @@
 import React from "react";
 
-export const Home = () => {
+export const OrdersPage = () => {
   return (
     <div>
       <header className="bg-gray-800 flex items-center justify-between shadow-md h-[10vh]">
