@@ -97,6 +97,10 @@ MVP DEVELOPMENT PLAN:
   Custom hooks for API calls
   Mobile-first responsive CSS
 
+  Add theming tokens and global styles
+  Add tests for core flows 
+  
+
   Phase 3: Integration & Deployment (Week 4)
 
   Frontend API integration with backend
@@ -109,4 +113,5 @@ MVP DEVELOPMENT PLAN:
   ✅ Weekly report calculations
   ✅ Mobile-usable UI
   ✅ Backend + frontend integration working
+
 
