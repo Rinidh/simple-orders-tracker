@@ -14,6 +14,9 @@ FEATURES 'MUST' INCLUDE after MVP (Not in order):
   - whatsapp API integ - when order is marked as Ready / Out for delivery, auto message to customer is sent
   - cust name field in OrderForm fetches from whatsapp/google contacts
 
+DOUBTS TO CLEAR:
+  - in useApi, why does request meth setError as well as throw the error
+
 MIDDLEWARE ADDITION:
   Medium Priority
 

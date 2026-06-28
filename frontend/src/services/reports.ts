@@ -1,4 +1,5 @@
-import type { ApiError, ApiResponse } from "../types/api";
+import { apiRequest } from "../hooks/useApi";
+import type { ApiResponse } from "../types/api";
 
 const REPORTS_API_PATH = "/api/reports";
 
@@ -30,25 +31,8 @@ function buildReportFiltersUrl(filters: ReportFilters): string {
   return query ? `${REPORTS_API_PATH}?${query}` : REPORTS_API_PATH;
 }
 
-async function request<T>(url: string): Promise<T> {
-  const response = await fetch(url, {
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const data = (await response.json()) as T | ApiError;
-
-  if (!response.ok) {
-    const apiError = data as ApiError;
-    throw new Error(apiError.errors?.join(", ") ?? apiError.message);
-  }
-
-  return data as T;
-}
-
 export async function getReport(
   filters: ReportFilters,
 ): Promise<ApiResponse<ReportSummary>> {
-  return request<ApiResponse<ReportSummary>>(buildReportFiltersUrl(filters));
+  return apiRequest<ApiResponse<ReportSummary>>(buildReportFiltersUrl(filters));
 }
