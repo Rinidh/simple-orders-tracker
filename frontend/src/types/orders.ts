@@ -20,6 +20,8 @@ export type OrderItem = {
 };
 
 export type Order = {
+  _id?: string;
+  id?: string;
   customerName: string;
   contact: string;
   addressOrPickupNotes: string;
@@ -32,6 +34,8 @@ export type Order = {
   paymentMethod: PaymentMethod;
   status: OrderStatus;
   paymentReceived: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type OrderFilters = {
