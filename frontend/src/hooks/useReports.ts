@@ -14,7 +14,6 @@ export type ReportMetrics = {
   completedOrders: number;
   dailySales: DailySalesPoint[];
   outstandingBalance: number;
-  totalItems: number;
   totalOrders: number;
   totalSales: number;
 };
@@ -149,10 +148,6 @@ function calculateMetrics(
     outstandingBalance: orders
       .filter((order) => !order.paymentReceived)
       .reduce((total, order) => total + order.totalAmount, 0),
-    totalItems: orders.reduce(
-      (total, order) => total + order.items.reduce((sum, item) => sum + item.quantity, 0),
-      0,
-    ),
     totalOrders: orders.length,
     totalSales: report?.totalSales ?? 0,
   };
@@ -256,7 +251,6 @@ export function useReports(options: UseReportsOptions = {}) {
     setEndDate,
     setStartDate,
     startDate,
-    totalItems: metrics.totalItems,
     totalOrders: metrics.totalOrders,
     totalSales: metrics.totalSales,
     updateDateRange,

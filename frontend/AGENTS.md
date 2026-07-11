@@ -54,7 +54,7 @@ It is a concise reference for implementers and future agents working on the mobi
 
 - ReportsPage
   - Date-range controls; default set to previous one week
-  - `SummaryTiles` for total sales, outstanding balance (unpaid yet), orders completed out of all created, total items created
+  - `SummaryTiles` for total sales, outstanding balance (unpaid yet), and orders completed out of all created
   - simple bar chart or sparkline of total sales per day
 
 ## Core components

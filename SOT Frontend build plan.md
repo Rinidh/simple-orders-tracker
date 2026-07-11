@@ -57,7 +57,7 @@ Build the frontend from the structure described in `frontend/AGENTS.md` having t
 4. Build `useReports`
    - Default date range to the previous 7 days.
    - Fetch `/api/reports`.
-   - Also fetch `/api/orders` for the same date range to compute frontend-only metrics required by `frontend/AGENTS.md`: outstanding balance, completed count, total order count, total items, and daily sales chart data.
+   - Also fetch `/api/orders` for the same date range to compute frontend-only metrics required by `frontend/AGENTS.md`: outstanding balance, completed count, total order count, and daily sales chart data.
    - Treat backend report totals as the source for paid sales totals.
 
 ## Components and Pages
@@ -138,7 +138,7 @@ Build the frontend from the structure described in `frontend/AGENTS.md` having t
 
 12. Build `SummaryTiles`
 
-- Show total sales, outstanding balance, completed count out of total orders, and total items.
+- Show total sales, outstanding balance, and completed count out of total orders.
 - Use compact tiles with high-contrast labels and values.
 - Accept fully computed values from `useReports`.
 
