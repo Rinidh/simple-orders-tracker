@@ -1,25 +1,9 @@
+import { Header } from "../components/Header";
+
 export const OrdersPage = () => {
   return (
     <div>
-      <header className="bg-gray-800 flex items-center justify-between shadow-md h-[10vh]">
-        <div className="md:shrink-0 h-full w-auto">
-          <img
-            src="../../assets/logo.png"
-            alt="company logo"
-            className="h-full w-auto object-contain rounded-md"
-          />
-        </div>
-        <h1 className="font-mono text-xs sm:text-base tracking-[.5em] text-center">
-          SIMPLE ORDERS TRACKER
-        </h1>
-        <div className="md:shrink-0 h-full w-auto">
-          <img
-            src="../../assets/profilePic.png"
-            alt="profile photo"
-            className="h-full w-auto rounded-full p-2"
-          />
-        </div>
-      </header>
+      <Header />
 
       <section className="flex flex-wrap items-center justify-between py-2 px-4 mx-auto max-w-4xl">
         <div className="flex items-center ml-4">
