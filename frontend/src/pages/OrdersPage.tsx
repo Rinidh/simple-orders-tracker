@@ -1,11 +1,6 @@
-import { BottomNav } from "../components/BottomNav";
-import { Header } from "../components/Header";
-
 export const OrdersPage = () => {
   return (
     <div>
-      <Header />
-
       <section className="flex flex-wrap items-center justify-between py-2 px-4 mx-auto max-w-4xl">
         <div className="flex items-center ml-4">
           <svg
@@ -61,8 +56,6 @@ export const OrdersPage = () => {
           Order 3
         </div>
       </main>
-
-      <BottomNav />
 
       <button
         aria-label="Add"
