@@ -1,3 +1,4 @@
+import { BottomNav } from "../components/BottomNav";
 import { Header } from "../components/Header";
 
 export const OrdersPage = () => {
@@ -61,113 +62,7 @@ export const OrdersPage = () => {
         </div>
       </main>
 
-      <footer className="sm:hidden fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700">
-        <nav className="max-w-4xl mx-auto flex justify-between items-center h-14 px-4">
-          <a
-            href="#"
-            className="flex flex-col items-center justify-center text-center text-gray-200 hover:text-white"
-          >
-            <svg
-              className="h-6 w-6 mb-0.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path
-                d="M3 11.5L12 4l9 7.5"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M5 21h14a1 1 0 0 0 1-1v-7H4v7a1 1 0 0 0 1 1z"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            <span className="text-xs text-gray-300">Home</span>
-          </a>
-
-          <a
-            href="#"
-            className="flex flex-col items-center justify-center text-center text-gray-200 hover:text-white"
-          >
-            <svg
-              className="h-6 w-6 mb-0.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path
-                d="M3 3v18h18"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M7 13v-6"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M12 17V7"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M17 11v-1"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            <span className="text-xs text-gray-300">Analysis</span>
-          </a>
-
-          <a
-            href="#"
-            className="flex flex-col items-center justify-center text-center text-gray-200 hover:text-white"
-          >
-            <svg
-              className="h-6 w-6 mb-0.5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <circle
-                cx="12"
-                cy="12"
-                r="9"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M12 8h.01"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-              <path
-                d="M11 12h1v4"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-            <span className="text-xs text-gray-300">About</span>
-          </a>
-        </nav>
-      </footer>
+      <BottomNav />
 
       <button
         aria-label="Add"
