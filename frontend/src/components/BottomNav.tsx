@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 const navItems = [
   {
     label: "Orders",
-    to: "/orders",
+    to: "/",
     icon: (
       <svg
         className="h-6 w-6 mb-0.5"

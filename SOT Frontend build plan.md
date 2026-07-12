@@ -75,7 +75,7 @@ Build the frontend from the structure described in `frontend/AGENTS.md` having t
 
 3. Update `App`
    - Add React Router routes:
-     - `/` and `/orders` -> `OrdersPage`
+     - `/` -> `OrdersPage`
      - `/orders/new` -> `NewOrderPage`
      - `/reports` -> `ReportsPage`
    - Render shared app shell with `Header`, route content, `BottomNav`, and bottom padding for mobile nav.
