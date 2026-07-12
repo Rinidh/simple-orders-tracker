@@ -63,6 +63,7 @@ This repository contains a monolithic MERN stack application for a home snack bu
 - Build frontend with small-screen-first CSS and touch-friendly UI
 - Document component and API conventions for future agents
 - In backend code, use custom error classes from `backend/errors/` and throw instances of those classes from controllers and middleware so API errors are handled consistently
+- Do major calculations on backend and frontend consumes results e.g. metrics from backend `/api/reports` endpoint consumed by `useReports`
 
 ## Implementation notes
 
@@ -70,6 +71,7 @@ This repository contains a monolithic MERN stack application for a home snack bu
 - Use one MongoDB database for orders and reports
 - Prefer reusable mobile components and compact list layouts
 - Ensure status changes and payment updates sync correctly
+- Keep report metric definitions centralized in the backend: paid sales count orders with `status: "Paid"` and `paymentReceived: true`, completed orders are `Delivered` or `Paid`, and outstanding balance is the total for unpaid orders
 
 ## Logging
 

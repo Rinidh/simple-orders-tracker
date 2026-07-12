@@ -34,7 +34,7 @@ Build the frontend from the structure described in `frontend/AGENTS.md` having t
 
 5. Create `frontend/src/services/reports.ts`
    - Implement `getReport({ startDate, endDate })`.
-   - Keep response typing aligned with current backend: `totalSales`, `totalOrders`, `startDate`, `endDate`.
+   - Keep response typing aligned with backend report metrics: `totalSales`, `totalOrders`, `completedOrders`, `outstandingBalance`, sorted `dailySales`, `startDate`, `endDate`.
 
 ## Hooks
 
@@ -57,8 +57,8 @@ Build the frontend from the structure described in `frontend/AGENTS.md` having t
 4. Build `useReports`
    - Default date range to the previous 7 days.
    - Fetch `/api/reports`.
-   - Also fetch `/api/orders` for the same date range to compute frontend-only metrics required by `frontend/AGENTS.md`: outstanding balance, completed count, total order count, total sales and daily sales chart data.
-   - Treat backend report totals as the source for paid sales totals.
+   - Consume backend-provided report metrics directly; do not fetch `/api/orders` to calculate report summaries in the frontend.
+   - Treat `/api/reports` as the source for paid sales totals, outstanding balance, completed count, total order count, and daily sales chart data.
 
 ## Components and Pages
 
@@ -163,7 +163,6 @@ Build the frontend from the structure described in `frontend/AGENTS.md` having t
 
 ## Assumptions
 
-- No backend changes are included in this frontend plan.
-- Missing report metrics will be computed client-side from `/api/orders` until the backend report endpoint expands.
+- Backend `/api/reports` returns all report metrics needed by `useReports`.
 - No new icon dependency is required; use existing inline SVG-style icons unless the project later adds an icon library.
 - `reminders.txt` remains unread and out of scope.

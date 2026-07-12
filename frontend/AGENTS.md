@@ -29,7 +29,7 @@ It is a concise reference for implementers and future agents working on the mobi
     - `useApi.ts` — fetch wrapper, error handling
     - `useOrders.ts` — list queries, filters, pagination
     - `useOrder.ts` — single-order fetch + mutations
-    - `useReports.ts` — reports + aggregations
+    - `useReports.ts` — report fetching and backend-provided metrics
   - `services/`
     - `orders.ts` — calls to `/api/orders`
     - `reports.ts` — calls to `/api/reports`
@@ -106,6 +106,7 @@ It is a concise reference for implementers and future agents working on the mobi
 - `useApi` should centralize fetch logic, auth header handling, retry/backoff, and JSON error shapes.
 - `useOrders` handles list fetching, filters, optimistic updates for status changes, and cache invalidation.
 - `useOrder` supports loading a single order, patching status/payment, and optimistic UI updates.
+- `useReports` handles report fetching for the selected date range and extracting the metrics from backend
 
 API endpoints mapping
 
@@ -116,7 +117,7 @@ API endpoints mapping
 - PATCH `/api/orders/:id/status` — update status
 - PATCH `/api/orders/:id/payment` — update payment flag
 - DELETE `/api/orders/:id` —
-- GET `/api/reports` — aggregated metrics (date-range)
+- GET `/api/reports` — aggregated date-range metrics: `totalOrders`, `totalSales`, `completedOrders`, `outstandingBalance`, and sorted `dailySales`
 
 ## Appearance & design tokens
 
