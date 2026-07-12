@@ -8,7 +8,16 @@ export type ReportFilters = {
   endDate?: string;
 };
 
+export type DailySalesPoint = {
+  date: string;
+  totalSales: number;
+  totalOrders: number;
+};
+
 export type ReportSummary = {
+  completedOrders: number;
+  dailySales: DailySalesPoint[];
+  outstandingBalance: number;
   totalSales: number;
   totalOrders: number;
   startDate: string | null;

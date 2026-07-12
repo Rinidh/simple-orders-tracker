@@ -1,14 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { ApiRequestError } from "./useApi";
-import { listOrders } from "../services/orders";
-import { getReport, type ReportFilters, type ReportSummary } from "../services/reports";
-import type { Order } from "../types/orders";
-
-export type DailySalesPoint = {
-  date: string;
-  totalSales: number;
-  totalOrders: number;
-};
+import {
+  getReport,
+  type DailySalesPoint,
+  type ReportFilters,
+  type ReportSummary,
+} from "../services/reports";
 
 export type ReportMetrics = {
   completedOrders: number;
@@ -51,104 +48,12 @@ function getDefaultDateRange(): Required<ReportFilters> {
   };
 }
 
-function parseDateInputValue(value?: string | null): Date | null {
-  if (!value) {
-    return null;
-  }
-
-  const [year, month, day] = value.slice(0, 10).split("-").map(Number);
-
-  if (!year || !month || !day) {
-    return null;
-  }
-
-  const date = new Date(year, month - 1, day);
-
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function eachDateInRange(startDate?: string, endDate?: string): string[] {
-  const parsedStartDate = parseDateInputValue(startDate);
-  const parsedEndDate = parseDateInputValue(endDate);
-
-  if (!parsedStartDate || !parsedEndDate || parsedStartDate > parsedEndDate) {
-    return [];
-  }
-
-  const dates: string[] = [];
-
-  for (
-    let cursor = parsedStartDate;
-    cursor <= parsedEndDate;
-    cursor = new Date(cursor.getTime() + DAY_IN_MS)
-  ) {
-    dates.push(toDateInputValue(cursor));
-  }
-
-  return dates;
-}
-
-function isCompletedOrder(order: Order): boolean {
-  return order.status === "Delivered" || order.status === "Paid";
-}
-
-function isPaidSalesOrder(order: Order): boolean {
-  return order.status === "Paid" && order.paymentReceived;
-}
-
-function getOrderDateKey(order: Order): string {
-  return order.orderDate.slice(0, 10);
-}
-
-function buildDailySales(orders: Order[], filters: ReportFilters): DailySalesPoint[] {
-  const totalsByDate = new Map<string, DailySalesPoint>();
-
-  for (const date of eachDateInRange(filters.startDate, filters.endDate)) {
-    totalsByDate.set(date, {
-      date,
-      totalOrders: 0,
-      totalSales: 0,
-    });
-  }
-
-  for (const order of orders) {
-    if (!isPaidSalesOrder(order)) {
-      continue;
-    }
-
-    const date = getOrderDateKey(order);
-    const currentPoint =
-      totalsByDate.get(date) ??
-      ({
-        date,
-        totalOrders: 0,
-        totalSales: 0,
-      } satisfies DailySalesPoint);
-
-    totalsByDate.set(date, {
-      ...currentPoint,
-      totalOrders: currentPoint.totalOrders + 1,
-      totalSales: currentPoint.totalSales + order.totalAmount,
-    });
-  }
-
-  return [...totalsByDate.values()].sort((left, right) =>
-    left.date.localeCompare(right.date),
-  );
-}
-
-function calculateMetrics(
-  report: ReportSummary | null,
-  orders: Order[],
-  filters: ReportFilters,
-): ReportMetrics {
+function getReportMetrics(report: ReportSummary | null): ReportMetrics {
   return {
-    completedOrders: orders.filter(isCompletedOrder).length,
-    dailySales: buildDailySales(orders, filters),
-    outstandingBalance: orders
-      .filter((order) => !order.paymentReceived)
-      .reduce((total, order) => total + order.totalAmount, 0),
-    totalOrders: orders.length,
+    completedOrders: report?.completedOrders ?? 0,
+    dailySales: report?.dailySales ?? [],
+    outstandingBalance: report?.outstandingBalance ?? 0,
+    totalOrders: report?.totalOrders ?? 0,
     totalSales: report?.totalSales ?? 0,
   };
 }
@@ -162,7 +67,6 @@ export function useReports(options: UseReportsOptions = {}) {
     options.initialEndDate ?? defaultDateRange.endDate,
   );
   const [report, setReport] = useState<ReportSummary | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
   const [error, setError] = useState<ApiRequestError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [refreshIndex, setRefreshIndex] = useState(0);
@@ -175,10 +79,7 @@ export function useReports(options: UseReportsOptions = {}) {
     [endDate, startDate],
   );
 
-  const metrics = useMemo(
-    () => calculateMetrics(report, orders, filters),
-    [filters, orders, report],
-  );
+  const metrics = useMemo(() => getReportMetrics(report), [report]);
 
   const refresh = useCallback(() => {
     setRefreshIndex((currentIndex) => currentIndex + 1);
@@ -201,20 +102,13 @@ export function useReports(options: UseReportsOptions = {}) {
       setError(null);
 
       try {
-        const [reportResponse, ordersResponse] = await Promise.all([
-          getReport(filters),
-          listOrders({
-            endDate: filters.endDate,
-            startDate: filters.startDate,
-          }),
-        ]);
+        const reportResponse = await getReport(filters);
 
         if (!isCurrentRequest) {
           return;
         }
 
         setReport(reportResponse.data);
-        setOrders(ordersResponse.data);
       } catch (caughtError) {
         if (!isCurrentRequest) {
           return;
@@ -243,7 +137,6 @@ export function useReports(options: UseReportsOptions = {}) {
     filters,
     isLoading,
     metrics,
-    orders,
     outstandingBalance: metrics.outstandingBalance,
     refresh,
     report,
