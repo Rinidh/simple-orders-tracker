@@ -1,49 +1,22 @@
+import { FilterBar } from "../components/FilterBar";
+import { useOrders } from "../hooks/useOrders";
+
 export const OrdersPage = () => {
+  const { clearFilters, filters, searchText, setSearchText, updateFilter } =
+    useOrders();
+
   return (
     <div>
-      <section className="flex flex-wrap items-center justify-between py-2 px-4 mx-auto max-w-4xl">
-        <div className="flex items-center ml-4">
-          <svg
-            className="h-5 w-5 text-gray-200 mx-0.5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path d="M3 5h18" stroke-width="2" stroke-linecap="round" />
-            <path d="M6 12h12" stroke-width="2" stroke-linecap="round" />
-            <path d="M10 19h4" stroke-width="2" stroke-linecap="round" />
-          </svg>
-          <button className="mx-0.5 py-0.5 px-1 border-2 border-gray-200 rounded-sm bg-gray-200 text-black cursor-pointer hover:bg-gray-100 hover:text-black transition-colors">
-            Status
-          </button>
-          <button className="mx-0.5 py-0.5 px-1 border-2 border-gray-200 rounded-sm cursor-pointer hover:bg-gray-100 hover:text-black transition-colors">
-            Payment
-          </button>
-        </div>
-
-        <div className="relative max-[495px]:mt-3 flex-1 min-w-2xs max-w-md">
-          <svg
-            className="absolute left-2 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle cx="11" cy="11" r="8" stroke-width="2" />
-            <path
-              d="m21 21-4.35-4.35"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search Orders"
-            className="border-2 border-gray-200 rounded-sm p-1 pl-9 w-full max-w-2xl placeholder:text-gray-400"
-          />
-        </div>
-      </section>
+      <FilterBar
+        filters={filters}
+        searchText={searchText}
+        onStatusChange={(status) => updateFilter("status", status)}
+        onPaymentFilterChange={(paymentReceived) =>
+          updateFilter("paymentReceived", paymentReceived)
+        }
+        onSearchChange={setSearchText}
+        onClearFilters={clearFilters}
+      />
 
       <main className="mt-4 p-4 grid gap-4 grid-cols-autofit">
         <div className="bg-gray-700 h-[7em] rounded-md flex items-center justify-center ">
