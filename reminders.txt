@@ -3,6 +3,7 @@ WARN: This file is for planning, outlining and personal reference. It may or may
 Project planning & research: https://chatgpt.com/share/69ee4a08-3be8-83ea-923e-4d29f3acd165
 
 FEATURES 'MUST' INCLUDE after MVP (Not in order):
+  - after all done in dark mode, implement light mode
   - Performace (fast UI animations, fast backend, small bundle size, smaller libraries, )
   - All Gujrati text / language switch button
   - auth
