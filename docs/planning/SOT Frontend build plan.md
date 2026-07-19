@@ -165,4 +165,3 @@ Build the frontend from the structure described in `frontend/AGENTS.md` having t
 
 - Backend `/api/reports` returns all report metrics needed by `useReports`.
 - No new icon dependency is required; use existing inline SVG-style icons unless the project later adds an icon library.
-- `reminders.txt` remains unread and out of scope.
