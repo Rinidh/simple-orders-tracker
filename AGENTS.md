@@ -25,7 +25,7 @@ This repository contains a monolithic MERN stack application for a home snack bu
 
 ### Privacy boundaries
 
-- Do not read `reminders.txt` during normal execution. It contains personal reminders and notes, and agents should only open it if the user explicitly asks.
+- Do not read files under `docs/` during normal execution. It contains reminders, brain storming, personal assistance notes, links, and UI sketches; agents should only open a `docs/` file when the chat explicitly references that file.
 
 ### Recommended stack
 
