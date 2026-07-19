@@ -65,8 +65,8 @@ export const OrderCard = ({
       }}
       className="max-w-xl cursor-pointer rounded-md bg-gray-700 p-4 text-white shadow-md transition-colors hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900"
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 sm:flex-1 space-y-2">
+      <div className="flex gap-4 flex-row items-start justify-between">
+        <div className="min-w-0 flex-1 space-y-2">
           <h2 className="truncate text-lg font-semibold leading-tight">
             {order.customerName}
           </h2>

@@ -40,10 +40,7 @@ export function formatCurrency(
   }).format(amount);
 }
 
-export function formatDate(
-  date: string | Date,
-  locale = "en-UG",
-): string {
+export function formatDate(date: string | Date, locale = "en-UG"): string {
   const parsedDate = date instanceof Date ? date : new Date(date);
 
   if (Number.isNaN(parsedDate.getTime())) {
@@ -62,7 +59,5 @@ export function summarizeItems(items: OrderItem[]): string {
     return "No items";
   }
 
-  return items
-    .map((item) => `${item.name} x${item.quantity}`)
-    .join(", ");
+  return items.map((item) => `${item.name} × ${item.quantity}`).join(", ");
 }
