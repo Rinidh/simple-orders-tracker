@@ -10,8 +10,7 @@ import {
 type OrderCardProps = {
   order: Order;
   onOpenDetail?: (order: Order) => void;
-  onStatusChange?: (order: Order, status: OrderStatus) => void;
-  onMarkPaid?: (order: Order) => void;
+  onStatusChange?: (order: Order) => void;
   isUpdating?: boolean;
 };
 
@@ -39,13 +38,11 @@ export const OrderCard = ({
   order,
   onOpenDetail,
   onStatusChange,
-  onMarkPaid,
   isUpdating = false,
 }: OrderCardProps) => {
   const nextStatus = getNextStatus(order.status);
   const canAdvanceStatus =
     nextStatus !== order.status && Boolean(onStatusChange);
-  const canMarkPaid = !order.paymentReceived && Boolean(onMarkPaid);
 
   const handleCardClick = () => {
     onOpenDetail?.(order);
@@ -78,8 +75,16 @@ export const OrderCard = ({
           </p>
         </div>
 
-        <div className="flex shrink-0 flex-col items-start gap-3 sm:items-end">
-          <StatusBadge status={order.status} className="max-w-full" />
+        <div className="flex shrink-0 flex-col items-start gap-3">
+          <StatusBadge
+            status={order.status}
+            className="max-w-full"
+            editable={true}
+            disabled={!canAdvanceStatus || isUpdating}
+            onChange={(nextStatus) => {
+              onStatusChange?.(order);
+            }}
+          />
 
           <span className={getPaymentChipClassName(order.paymentReceived)}>
             {order.paymentReceived ? "Payment received" : "Payment pending"}
@@ -89,29 +94,6 @@ export const OrderCard = ({
             {formatCurrency(order.totalAmount)}
           </p>
         </div>
-      </div>
-
-      <div
-        className="mt-4 flex flex-wrap gap-2 border-t border-gray-600 pt-4"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <button
-          type="button"
-          disabled={!canAdvanceStatus || isUpdating}
-          onClick={() => onStatusChange?.(order, nextStatus)}
-          className="min-h-10 rounded-sm border-2 border-gray-200 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {canAdvanceStatus ? `Next: ${nextStatus}` : "Status complete"}
-        </button>
-
-        <button
-          type="button"
-          disabled={!canMarkPaid || isUpdating}
-          onClick={() => onMarkPaid?.(order)}
-          className="min-h-10 rounded-sm border-2 border-green-300 bg-green-200 px-3 py-2 text-sm font-semibold text-green-950 transition-colors hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {order.paymentReceived ? "Paid" : "Mark paid"}
-        </button>
       </div>
     </article>
   );

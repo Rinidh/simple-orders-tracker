@@ -63,13 +63,6 @@ export const OrdersPage = () => {
             onStatusChange={(selectedOrder) => {
               void quickAdvanceStatus(selectedOrder);
             }}
-            onMarkPaid={(selectedOrder) => {
-              const orderId = selectedOrder._id ?? selectedOrder.id;
-
-              if (orderId) {
-                void quickUpdatePayment(orderId, true);
-              }
-            }}
           />
         ))}
       </main>
