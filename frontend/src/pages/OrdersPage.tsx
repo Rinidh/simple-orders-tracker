@@ -1,9 +1,20 @@
 import { FilterBar } from "../components/FilterBar";
+import { OrderCard } from "../components/OrderCard";
 import { useOrders } from "../hooks/useOrders";
 
 export const OrdersPage = () => {
-  const { clearFilters, filters, searchText, setSearchText, updateFilter } =
-    useOrders();
+  const {
+    clearFilters,
+    error,
+    filters,
+    isLoading,
+    orders,
+    quickAdvanceStatus,
+    quickUpdatePayment,
+    searchText,
+    setSearchText,
+    updateFilter,
+  } = useOrders();
 
   return (
     <div>
@@ -19,15 +30,48 @@ export const OrdersPage = () => {
       />
 
       <main className="mt-4 p-4 grid gap-4 grid-cols-autofit">
-        <div className="bg-gray-700 h-[7em] rounded-md flex items-center justify-center ">
-          Order 1
-        </div>
-        <div className="bg-gray-700 h-[7em] rounded-md flex items-center justify-center ">
-          Order 2
-        </div>
-        <div className="bg-gray-700 h-[7em] rounded-md flex items-center justify-center ">
-          Order 3
-        </div>
+        {isLoading ? (
+          <div className="rounded-md bg-gray-700 p-4 text-center text-gray-200">
+            Loading orders...
+          </div>
+        ) : null}
+
+        {error ? (
+          <div
+            className="rounded-md border border-red-300 bg-red-200 p-4 text-sm font-semibold text-red-950"
+            role="alert"
+          >
+            {error.message}
+          </div>
+        ) : null}
+
+        {!isLoading && !error && orders.length === 0 ? (
+          <div className="rounded-md bg-gray-700 p-4 text-center text-gray-200">
+            No orders found.
+          </div>
+        ) : null}
+
+        {orders.map((order) => (
+          <OrderCard
+            key={
+              order._id ??
+              order.id ??
+              `${order.customerName}-${order.orderDate}`
+            }
+            order={order}
+            // onOpenDetail={() => {}} // TODO: to implement opening OrderDetailPanel after it is created
+            onStatusChange={(selectedOrder) => {
+              void quickAdvanceStatus(selectedOrder);
+            }}
+            onMarkPaid={(selectedOrder) => {
+              const orderId = selectedOrder._id ?? selectedOrder.id;
+
+              if (orderId) {
+                void quickUpdatePayment(orderId, true);
+              }
+            }}
+          />
+        ))}
       </main>
 
       <button
@@ -44,9 +88,9 @@ export const OrdersPage = () => {
           aria-hidden="true"
         >
           <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
             d="M12 4v16M4 12h16"
           />
         </svg>
