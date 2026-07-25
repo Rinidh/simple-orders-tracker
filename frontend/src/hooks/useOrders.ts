@@ -182,33 +182,7 @@ export function useOrders(options: UseOrdersOptions = {}) {
           return;
         }
 
-        // setOrders(response.data);
-        setOrders([
-          {
-            _id: "_id val",
-            id: "id val",
-            customerName: "name",
-            contact: "phone no.",
-            addressOrPickupNotes: "notes",
-            items: [
-              {
-                name: "item name",
-                quantity: 1,
-                price: 10,
-              },
-            ],
-            totalAmount: 100,
-            orderDate: "2026-01-01",
-            orderTime: "06:00",
-            deliveryDate: "2026-01-01",
-            deliveryTime: "06: 00",
-            paymentMethod: "Cash",
-            status: "Ordered",
-            paymentReceived: false,
-            createdAt: "2026-01-01",
-            updatedAt: "2026-01-01",
-          },
-        ]);
+        setOrders(response.data);
         setCount(response.count);
       } catch (caughtError) {
         if (!isCurrentRequest) {
