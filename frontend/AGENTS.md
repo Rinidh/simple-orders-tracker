@@ -63,8 +63,9 @@ It is a concise reference for implementers and future agents working on the mobi
   - Spacious, non-compact card
   - Left column: customer name, item names summary (comma separated), delivery date (deadline)
   - Right column: colored `StatusBadge`, Payment Received chip, total amount
-  - Quick actions: update status, mark paid
-  - Clicking/touching it opens `OrderDetailPanel` with more info
+  - Quick actions: update status
+  - Status quick action prompts for confirmation before advancing to the next lifecycle state
+  - Clicking/touching it opens `OrderDetailPanel` with more info and ability to mark as paid
 
 - `OrderList`
   - Virtualized or paginated list container rendering `OrderCard`s
@@ -93,6 +94,8 @@ It is a concise reference for implementers and future agents working on the mobi
 - `StatusBadge`
   - Big visible pill with background colors, icons and text reflecting lifecycle states
   - Clicking/touching on it changes it to next lifecycle state
+  - When editable, touching/clicking it confirms advancement to the next lifecycle state
+  - Parent components that mutate order status should confirm before applying the change
 
 - `FilterBar`
   - Filters for cards: Dropdown for statuses, chip for payment received
@@ -150,7 +153,7 @@ API endpoints mapping
 - Mobile-first layout: single-column lists, edge-to-edge cards, large touch targets
 - Bottom navigation with primary actions reachable by thumb
 - Use color + icon + text in badges for quick recognition
-- Confirmations for destructive actions (delete, cancel)
+- Confirmations for destructive actions and important state-changing actions such as status advancement
 
 ## Accessibility
 
@@ -170,7 +173,7 @@ API endpoints mapping
 ## Testing & linting
 
 - Unit test hooks and pure utils (e.g., totals, validation)
-- Component-level tests for key flows: create order, change status, mark payment
+- Component-level tests for key flows: create order, confirm/change status, mark payment
 - E2E smoke tests for Orders → Detail → Status updates (optional)
 
 ## Performance & offline considerations (notes)
