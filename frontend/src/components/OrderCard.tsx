@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { StatusBadge } from "./StatusBadge";
+import { statusStyles } from "../constants/orderStatusStyles";
 import type { Order } from "../types/orders";
 import {
   formatCurrency,
@@ -46,6 +47,7 @@ export const OrderCard = ({
   const nextStatus = getNextStatus(order.status);
   const canAdvanceStatus =
     nextStatus !== order.status && Boolean(onStatusChange);
+  const nextStatusStyle = statusStyles[nextStatus].className;
 
   const handleCardClick = () => {
     onOpenDetail?.(order);
@@ -139,22 +141,28 @@ export const OrderCard = ({
 
             <h2
               id="status-confirmation-title"
-              className="pr-8 text-lg font-semibold leading-7"
+              className="pr-8 text-lg font-semibold leading-9"
             >
-              Are you sure you want to advance status to {nextStatus}?
+              Are you sure you want to advance status to{" "}
+              <span
+                className={`${nextStatusStyle} p-1 px-1.5 rounded-xl border`}
+              >
+                {nextStatus}
+              </span>{" "}
+              ?
             </h2>
 
-            <div className="mt-5 flex justify-end gap-3">
+            <div className="mt-5 flex justify-between gap-3">
               <button
                 type="button"
-                className="min-h-10 rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-100 transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-100"
+                className="flex-1 min-h-8 rounded-md border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-100 transition-colors hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-100"
                 onClick={closeStatusConfirmation}
               >
                 No
               </button>
               <button
                 type="button"
-                className="min-h-10 rounded-md bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                className="flex-1 min-h-8 rounded-md bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                 onClick={handleConfirmStatusAdvance}
               >
                 Yes
