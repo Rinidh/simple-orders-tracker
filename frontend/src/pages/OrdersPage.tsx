@@ -10,7 +10,6 @@ export const OrdersPage = () => {
     isLoading,
     orders,
     quickAdvanceStatus,
-    quickUpdatePayment,
     searchText,
     setSearchText,
     updateFilter,
