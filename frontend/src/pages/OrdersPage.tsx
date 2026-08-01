@@ -1,5 +1,5 @@
 import { FilterBar } from "../components/FilterBar";
-import { OrderCard } from "../components/OrderCard";
+import { OrderList } from "../components/OrderList";
 import { useOrders } from "../hooks/useOrders";
 
 export const OrdersPage = () => {
@@ -29,53 +29,25 @@ export const OrdersPage = () => {
         onClearFilters={clearFilters}
       />
 
-      <main className="mt-4 p-4 grid gap-4 grid-cols-autofit">
-        {isLoading ? (
-          <div className="rounded-md bg-gray-700 p-4 text-center text-gray-200">
-            Loading orders...
-          </div>
-        ) : null}
+      <OrderList
+        orders={orders}
+        isLoading={isLoading}
+        error={error}
+        pageSize={2}
+        onStatusChange={(selectedOrder) => {
+          if (
+            selectedOrder.status === "Delivered" &&
+            (selectedOrder._id || selectedOrder.id)
+          ) {
+            void quickUpdatePayment(
+              selectedOrder._id ?? selectedOrder.id,
+              true,
+            );
+          }
 
-        {error ? (
-          <div
-            className="rounded-md border border-red-300 bg-red-200 p-4 text-sm font-semibold text-red-950"
-            role="alert"
-          >
-            {error.message}
-          </div>
-        ) : null}
-
-        {!isLoading && !error && orders.length === 0 ? (
-          <div className="rounded-md bg-gray-700 p-4 text-center text-gray-200">
-            No orders found.
-          </div>
-        ) : null}
-
-        {orders.map((order) => (
-          <OrderCard
-            key={
-              order._id ??
-              order.id ??
-              `${order.customerName}-${order.orderDate}`
-            }
-            order={order}
-            // onOpenDetail={() => {}} // TODO: to implement opening OrderDetailPanel after it is created
-            onStatusChange={(selectedOrder) => {
-              if (
-                selectedOrder.status === "Delivered" &&
-                (selectedOrder._id || selectedOrder.id)
-              ) {
-                void quickUpdatePayment(
-                  selectedOrder._id ?? selectedOrder.id,
-                  true,
-                );
-              }
-
-              void quickAdvanceStatus(selectedOrder);
-            }}
-          />
-        ))}
-      </main>
+          void quickAdvanceStatus(selectedOrder);
+        }}
+      />
 
       <button
         aria-label="Add"
