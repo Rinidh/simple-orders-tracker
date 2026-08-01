@@ -156,7 +156,15 @@ export function useOrders(options: UseOrdersOptions = {}) {
   );
 
   const quickUpdatePayment = useCallback(
-    (id: string, paymentReceived: boolean) =>
+    (id: string | undefined, paymentReceived: boolean) => {
+      if (!id) {
+        const missingIdError = new ApiRequestError(
+          "Order is missing an id and cannot be updated.",
+        );
+        setError(missingIdError);
+        return Promise.reject(missingIdError);
+      }
+
       optimisticallyUpdateOrder(
         id,
         (order) => ({ ...order, paymentReceived }),
@@ -164,7 +172,8 @@ export function useOrders(options: UseOrdersOptions = {}) {
           const response = await updateOrderPayment(id, paymentReceived);
           return response.data;
         },
-      ),
+      );
+    },
     [optimisticallyUpdateOrder],
   );
 

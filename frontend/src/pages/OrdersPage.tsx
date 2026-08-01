@@ -13,6 +13,7 @@ export const OrdersPage = () => {
     searchText,
     setSearchText,
     updateFilter,
+    quickUpdatePayment,
   } = useOrders();
 
   return (
@@ -60,6 +61,16 @@ export const OrdersPage = () => {
             order={order}
             // onOpenDetail={() => {}} // TODO: to implement opening OrderDetailPanel after it is created
             onStatusChange={(selectedOrder) => {
+              if (
+                selectedOrder.status === "Delivered" &&
+                (selectedOrder._id || selectedOrder.id)
+              ) {
+                void quickUpdatePayment(
+                  selectedOrder._id ?? selectedOrder.id,
+                  true,
+                );
+              }
+
               void quickAdvanceStatus(selectedOrder);
             }}
           />
