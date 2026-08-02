@@ -49,12 +49,7 @@ Build the frontend from the structure described in `frontend/AGENTS.md` having t
    - Add optimistic helpers for quick status and payment updates.
    - Revert optimistic changes if the API call fails.
 
-3. Build `useOrder`
-   - Load one order by id when needed.
-   - Expose mutations for full update, status update, payment update, and delete.
-   - Track dirty local edits for `OrderDetailPanel`.
-
-4. Build `useReports`
+3. Build `useReports`
    - Default date range to the previous 7 days.
    - Fetch `/api/reports`.
    - Consume backend-provided report metrics directly; do not fetch `/api/orders` to calculate report summaries in the frontend.
@@ -110,7 +105,7 @@ Build the frontend from the structure described in `frontend/AGENTS.md` having t
    - Display status, delivery date, and order date.
    - Allow editing payment method, payment received, and address/pickup notes.
    - Disable Save until local changes differ from the original order.
-   - Save through `useOrder.updateOrder`.
+   - Save through `useOrders.updateOrder`.
 
 9. Build `ItemCard`
    - Controlled inputs for item name, quantity, and price.
@@ -152,7 +147,7 @@ Build the frontend from the structure described in `frontend/AGENTS.md` having t
 ## Test Plan
 
 - Add unit tests for `calculateOrderTotal`, `getNextStatus`, `summarizeItems`, and report aggregation helpers.
-- Add hook tests for `useOrders`, `useOrder`, and `useReports` with mocked fetch responses.
+- Add hook tests for `useOrders`, and `useReports` with mocked fetch responses.
 - Add component tests for:
   - `StatusBadge` next-status click.
   - `FilterBar` search/filter changes.

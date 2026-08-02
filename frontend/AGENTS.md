@@ -28,7 +28,6 @@ It is a concise reference for implementers and future agents working on the mobi
   - `hooks/`
     - `useApi.ts` — fetch wrapper, error handling
     - `useOrders.ts` — list queries, filters, pagination
-    - `useOrder.ts` — single-order fetch + mutations
     - `useReports.ts` — report fetching and backend-provided metrics
   - `services/`
     - `orders.ts` — calls to `/api/orders`
@@ -108,7 +107,6 @@ It is a concise reference for implementers and future agents working on the mobi
 
 - `useApi` should centralize fetch logic, auth header handling, retry/backoff, and JSON error shapes.
 - `useOrders` handles list fetching, filters, optimistic updates for status changes, and cache invalidation.
-- `useOrder` supports loading a single order, patching status/payment, and optimistic UI updates.
 - `useReports` handles report fetching for the selected date range and extracting the metrics from backend
 
 API endpoints mapping
