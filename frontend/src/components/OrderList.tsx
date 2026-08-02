@@ -8,6 +8,7 @@ type OrderListProps = {
   error: Error | null;
   onStatusChange: (order: Order) => void;
   pageSize?: number;
+  onOpenDetail: (order: Order) => void;
 };
 
 export const OrderList = ({
@@ -16,6 +17,7 @@ export const OrderList = ({
   error,
   onStatusChange,
   pageSize = 12,
+  onOpenDetail,
 }: OrderListProps) => {
   const [visiblePages, setVisiblePages] = useState(1);
 
@@ -79,6 +81,7 @@ export const OrderList = ({
             }
             order={order}
             onStatusChange={onStatusChange}
+            onOpenDetail={onOpenDetail}
           />
         ))}
       </main>

@@ -4,6 +4,7 @@ import {
   listOrders,
   updateOrderPayment,
   updateOrderStatus,
+  updateOrder as updateOrderService,
 } from "../services/orders";
 import type { Order, OrderFilters, OrderStatus } from "../types/orders";
 import { getNextStatus } from "../utils/orders";
@@ -177,6 +178,28 @@ export function useOrders(options: UseOrdersOptions = {}) {
     [optimisticallyUpdateOrder],
   );
 
+  const updateOrder = useCallback(
+    async (updatedOrder: Order) => {
+      const id = getOrderId(updatedOrder);
+
+      if (!id) {
+        const error = new ApiRequestError("Order is missing an id.");
+        setError(error);
+        return Promise.reject(error);
+      }
+
+      return optimisticallyUpdateOrder(
+        id,
+        () => updatedOrder,
+        async () => {
+          const response = await updateOrderService(id, updatedOrder);
+          return response.data;
+        },
+      );
+    },
+    [optimisticallyUpdateOrder],
+  );
+
   useEffect(() => {
     let isCurrentRequest = true;
 
@@ -229,5 +252,6 @@ export function useOrders(options: UseOrdersOptions = {}) {
     setFilters,
     setSearchText,
     updateFilter,
+    updateOrder,
   };
 }

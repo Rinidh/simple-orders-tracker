@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { FilterBar } from "../components/FilterBar";
 import { OrderList } from "../components/OrderList";
 import { useOrders } from "../hooks/useOrders";
+import type { Order } from "../types/orders";
+import { OrderDetailPanel } from "../components/OrderDetailPanel";
 
 export const OrdersPage = () => {
   const {
@@ -14,7 +17,9 @@ export const OrdersPage = () => {
     setSearchText,
     updateFilter,
     quickUpdatePayment,
+    updateOrder,
   } = useOrders();
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   return (
     <div>
@@ -33,7 +38,8 @@ export const OrdersPage = () => {
         orders={orders}
         isLoading={isLoading}
         error={error}
-        pageSize={2}
+        pageSize={5}
+        onOpenDetail={setSelectedOrder}
         onStatusChange={(selectedOrder) => {
           if (
             selectedOrder.status === "Delivered" &&
@@ -46,6 +52,16 @@ export const OrdersPage = () => {
           }
 
           void quickAdvanceStatus(selectedOrder);
+        }}
+      />
+
+      <OrderDetailPanel
+        order={selectedOrder}
+        isOpen={selectedOrder !== null}
+        onClose={() => setSelectedOrder(null)}
+        onSave={async (updatedOrder) => {
+          await updateOrder(updatedOrder);
+          setSelectedOrder(updatedOrder);
         }}
       />
 
